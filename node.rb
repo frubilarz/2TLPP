@@ -36,6 +36,11 @@ class Node
         triangulos[i][j]= triangulos[i][j].to_i
       end
     end
+    for i in 1..triangulos.length-1
+      m = triangulos[i]
+      triangulos[i]=[]
+      triangulos<< m[1]<<m[2]<<m[3]
+    end
     @mesh = triangulos
   end
 

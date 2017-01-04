@@ -6,7 +6,7 @@ class Triangulos
     @c = c
     angulosTriangulos(a,b,c)
     refinar(grado)
-    
+    verticeMasLargo(a,b,c)
   end
   def refinar(grado) #ingresa un grado y verifica si es o no refinable
     refinar = 0
@@ -25,6 +25,19 @@ class Triangulos
     @beta = Math.acos((aCuadrado+cCuadrado- bCuadrado )/(2*a*c))*angulo
     @gama = Math.acos((aCuadrado+bCuadrado-cCuadrado)/(2*a*b))*angulo
   end
+  
+  def verticeMasLargo(a,b,c)
+    if a > b && a > c
+      lado = 0
+    end
+    if b >a && b > c
+      lado = 1
+    end
+    if c > a && c > b
+      lado = 2
+    end
+    @largo= lado
+  end # complejidad O(1)
 
   def a
     return @a
@@ -52,6 +65,10 @@ class Triangulos
   
   def refinamiento
     return @refinamiento
+  end
+  
+  def largo
+    return @largo
   end
   
 end
