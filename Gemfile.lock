@@ -1,0 +1,16 @@
+GEM
+  specs:
+    geometry (6.5)
+    numru-narray (1.0.3)
+    ruby-mpi (0.3.2)
+      numru-narray (~> 1.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  geometry
+  ruby-mpi
+
+BUNDLED WITH
+   1.13.6
