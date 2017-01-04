@@ -1,13 +1,22 @@
 class Triangulos
-  def initialize(a,b,c)
+  
+  def initialize(a,b,c,grado)
     @a = a
     @b = b
     @c = c
     angulosTriangulos(a,b,c)
+    refinar(grado)
+    
   end
+  def refinar(grado) #ingresa un grado y verifica si es o no refinable
+    refinar = 0
+    if(alfa().to_f <= grado.to_f || beta().to_f <= grado.to_f || gama().to_f <= grado.to_f)
+      refinar = 1
+    end
+    @refinamiento = refinar
+  end 
 
-
-  def angulosTriangulos(a,b,c)
+  def angulosTriangulos(a,b,c)  # calcula los angulos del triangulo
     angulo = 180/Math::PI
     bCuadrado= b*b
     cCuadrado = c*c
@@ -40,11 +49,9 @@ class Triangulos
   def gama
     return @gama
   end
-
-  def perimetro
-    @perimetro = a+b+c
+  
+  def refinamiento
+    return @refinamiento
   end
-
-
-
+  
 end
