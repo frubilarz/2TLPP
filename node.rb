@@ -37,9 +37,7 @@ class Node
       end
     end
     for i in 1..triangulos.length-1
-      m = triangulos[i]
-      triangulos[i]=[]
-      triangulos<< m[1]<<m[2]<<m[3]
+      triangulos[i].delete_at(0)
     end
     @mesh = triangulos
   end
@@ -53,5 +51,8 @@ class Node
     @mesh
   end
   
+  def mesh_nuevo  
+    @mesh_nuevo
+  end
 
 end
