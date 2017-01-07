@@ -4,7 +4,7 @@ class Node
     lista = []
     File.open(node+'.node','r') do |f| #en espiral.lista estan las coordenadas de los puntos
       while linea = f.gets
-        lista << linea.delete!("\n") #chop elimina el ultimo caracter en este caso el salto de linea
+        lista << linea.delete("\n") #chop elimina el ultimo caracter en este caso el salto de linea
       end
     end
     for i in 0..lista.length-1
@@ -27,7 +27,7 @@ class Node
     triangulos = []
     File.open(mesh+'.mesh','r') do |f| # en espiral.lista estan definidos los triangulos con sus puntos
       while linea = f.gets
-        triangulos << linea.delete!("\n")
+        triangulos << linea.delete("\n")
       end
     end
     for i in 0..triangulos.length-1

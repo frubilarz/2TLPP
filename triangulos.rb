@@ -22,7 +22,7 @@ class Triangulos
     cCuadrado = c*c
     aCuadrado = a*a
     @alfa = Math.acos((bCuadrado+cCuadrado- aCuadrado)/(2*b*c))* angulo
-    @beta = Math.acos((aCuadrado+cCuadrado- bCuadrado )/(2*a*c))*angulo
+    @beta = Math.acos((aCuadrado+cCuadrado- bCuadrado)/(2*a*c))*angulo
     @gama = Math.acos((aCuadrado+bCuadrado-cCuadrado)/(2*a*b))*angulo
   end
   

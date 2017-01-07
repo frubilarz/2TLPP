@@ -4,12 +4,12 @@ require_relative './node'
 require 'mpi'
 #node = ARGV[0] # recive el nombre del fichero .node
 #mesh = ARGV[1] # recive el nombre del fichero .mesh
-#grado = ARGV[2]
-#MPI.Init
-#world = MPI::Comm::WORLD
+grado = ARGV[0]
+MPI.Init
+world = MPI::Comm::WORLD
 node = 'vertices'
 mesh= 'triangulos'
-grado = 12
+#grado = 12
 preproceso = Node.new(node,mesh) # instancia un objeto con los datos node y mesh 
 node = preproceso.node # prepocesamiento node
 mesh = preproceso.mesh # prepoceso mesh
@@ -67,16 +67,20 @@ def dividirTriangulosPorNodo(tamano,cantidad)
     procesador +=1    
     break if i >= cantidad
   end
+  for i in ma.length..cantidad
+    n=[]
+    n << i.to_i<<procesador.to_i
+    ma << n
+  end
   loop do
     ma.delete_at(ma.length-1)
     break if cantidad >= ma.length
   end
-  puts procesador
-  for i in resto..1
+  for i in resto..1 # corrije que no este fuera del rango de procesador
     if i == 0
       break
     end
-    ma[i][1]=procesador-2
+    ma[i][1]= (cantidad/tamano).to_i
   end
   return ma
 end
@@ -108,17 +112,50 @@ def generarNode(node)
   end
 end
 
+def combinaciones(mesh)
+  combinacion = []
+  dimension = get_dimension mesh
+  if dimension == 1 && mesh.length == 3
+    combinacion = mesh.combination(2).to_a
+  else
+    largo = mesh.length
+    if largo > 1
+      for i in 0..mesh.length-1
+        combinacion << mesh[i].combination(2).to_a
+      end
+    end
+  end
+  return combinacion
+end # complejidad O(2n)
+
+
+def candidatos_a_refinar(mesh,node,grado)
+  lista = []
+  combinacion = combinaciones(mesh)
+  for i in 1..combinacion.length-1
+    listaAyuda =[]
+    listaAyuda = combinacion[i]
+    uno = toEdge(node[listaAyuda[0][0]],node[listaAyuda[0][1]])
+    dos = toEdge(node[listaAyuda[1][0]],node[listaAyuda[1][1]])
+    tres = toEdge(node[listaAyuda[2][0]],node[listaAyuda[2][1]])
+    triangulo = Triangulos.new(uno.length, dos.length, tres.length, grado.to_i)
+    lista << triangulo.refinamiento
+  end
+  return lista
+end
+
 uno = toEdge(node[1],node[2])
 dos = toEdge(node[1],node[3])
 tres = toEdge(node[2],node[3])
 t = Triangulos.new(uno.length, dos.length, tres.length, grado.to_i) 
-cantidad = mesh[0][0].to_i/3
+cantidad = mesh[0][0].to_i/world.size
 mesh_nodo = dividirTriangulosPorNodo(cantidad.to_i,mesh[0][0].to_i)
 generarPart(mesh_nodo)
 generarNode(node)
 generarEle(mesh)
 
-#MPI.Finalize
+puts (candidatos_a_refinar(mesh,node,grado)).reduce(:+)
+MPI.Finalize
 
 
 
