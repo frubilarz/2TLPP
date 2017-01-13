@@ -168,6 +168,7 @@ triangulos_a_ref = triangulosArefinar(candidato)
 generarPart(mesh_nodo)
 generarNode(node)
 generarEle(mesh)
+
 def pertenezco_al_nodo(tr_a_refinar,mesh_nodo,rank)
   for i in 0..mesh_nodo.size-1
     if tr_a_refinar == mesh_nodo[i][0]
@@ -196,7 +197,7 @@ for i in 0..rank
     for j in 0..(triangulos_a_ref.length)-1
       ref = ref+pertenezco_al_nodo(triangulos_a_ref[j],mesh_nodo,rank)
     end
-    puts ref
+    puts 'rank: '+rank.to_s+' '+ref.to_s
     world.Send(a, 0, 1)
   end
 end
@@ -205,7 +206,6 @@ if rank == 0
     a = NArray.int(cantidad.to_i+resto)
     world.Recv(a, i, 1)
     
-    p a
   end
 end
 
