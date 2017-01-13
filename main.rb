@@ -156,6 +156,73 @@ def triangulosArefinar(refinar) #indice del triangulo en el vector
   return lista
 end #complejidad O(n)
 
+
+def crearTriangulo(mesh,node,listaDeTriangulosArefinar)
+  
+  combinacion = combinaciones(listaDeTriangulosArefinar)
+  dimension = get_dimension combinacion
+  if dimension ==2
+    triangulo = combinacion
+    lado = buscarNodo(triangulo,node)
+    punto = buscarPunto(node,triangulo[lado.to_i])
+    edge = toEdge(punto[0],punto[1])
+    puntoMedio = puntoMedio(edge,node)
+    nuevoTriangulo = []
+    for k in 0..triangulo.length-1
+      if(k!=lado)
+        triangulo[k]<<puntoMedio[0]
+        nuevoTriangulo << triangulo[k]
+      end
+    end
+    for j in 0..mesh.length-1
+      if(mesh[j]==listaDeTriangulosArefinar)
+        mesh[j]= nuevoTriangulo[0]
+      end
+    end
+    mesh<< nuevoTriangulo[1]
+
+    igual = iguales(mesh,triangulo,lado)
+
+
+    if igual != []
+      crearTriangulo(mesh,node,igual)
+    end
+    mesh[0][0]= mesh.length-1
+  end
+  if dimension!=2
+    for i in 0..combinacion.length-1
+      triangulo = combinacion[i]
+      lado = buscarNodo(triangulo,node)
+      punto = buscarPunto(node,triangulo[lado.to_i])
+      edge = toEdge(punto[0],punto[1])
+      puntoMedio = puntoMedio(edge,node)
+      nuevoTriangulo = []
+      for k in 0..triangulo.length-1
+        if(k!=lado)
+          triangulo[k]<<puntoMedio[0]
+          nuevoTriangulo << triangulo[k]
+        end
+      end
+      for j in 0..mesh.length-1
+        if(mesh[j]==listaDeTriangulosArefinar[i])
+          mesh[j]= nuevoTriangulo[0]
+        end
+      end
+      mesh<< nuevoTriangulo[1]
+
+      igual = iguales(mesh,triangulo,lado)
+
+
+      if igual != []
+        crearTriangulo(mesh,node,igual)
+      end
+    end
+    mesh[0][0]= mesh.length-1
+  end
+end #complejidad O(2n+n((n+1)+(n^2)+(1)+(n+1)+n+n)) --> O(2n+n(n^2+4n+3))--> O(2n+n^3+4n^2+3n)->O(n^3+4n^2+5)
+
+
+
 uno = toEdge(node[1],node[2])
 dos = toEdge(node[1],node[3])
 tres = toEdge(node[2],node[3])
@@ -180,6 +247,13 @@ def pertenezco_al_nodo(tr_a_refinar,mesh_nodo,rank)
   return 0
 end
 
+def mesh_por_rank(lista,mesh)
+  resultado =[]
+  for i in 0..lista.length-1
+    resultado << mesh[lista[i]+1]
+  end
+  return resultado
+end
 rank = world.rank
 
 for i in 0..rank
@@ -194,10 +268,11 @@ for i in 0..rank
       end
     end
     ref = 0
-    for j in 0..(triangulos_a_ref.length)-1
-      ref = ref+pertenezco_al_nodo(triangulos_a_ref[j],mesh_nodo,rank)
-    end
-    puts 'rank: '+rank.to_s+' '+ref.to_s
+    lista = a.to_a
+    mesh_temporal = mesh_por_rank(lista,mesh)
+    lista_candito = candidatos_a_refinar(mesh_temporal,node,grado)
+
+    puts 'rank: '+rank.to_s+' '+(lista_candito.reduce(:+)).to_s
     world.Send(a, 0, 1)
   end
 end
@@ -205,7 +280,7 @@ if rank == 0
   (world.size).times do |i|
     a = NArray.int(cantidad.to_i+resto)
     world.Recv(a, i, 1)
-    
+
   end
 end
 
