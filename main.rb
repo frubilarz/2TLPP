@@ -132,7 +132,7 @@ def combinaciones(mesh)
 end # complejidad O(2n)
 
 
-def candidatos_a_refinar(mesh,node,grado)
+def candidatos_a_refinar(mesh,node,grado) # genera una lista con los triangulos a refinar
   lista = []
   combinacion = combinaciones(mesh)
   for i in 1..combinacion.length-1
@@ -146,6 +146,7 @@ def candidatos_a_refinar(mesh,node,grado)
   end
   return lista
 end
+
 def triangulosArefinar(refinar) #indice del triangulo en el vector
   lista=[]
   for i in 0..refinar.length-1
@@ -157,76 +158,9 @@ def triangulosArefinar(refinar) #indice del triangulo en el vector
 end #complejidad O(n)
 
 
-def crearTriangulo(mesh,node,listaDeTriangulosArefinar)
-  
-  combinacion = combinaciones(listaDeTriangulosArefinar)
-  dimension = get_dimension combinacion
-  if dimension ==2
-    triangulo = combinacion
-    lado = buscarNodo(triangulo,node)
-    punto = buscarPunto(node,triangulo[lado.to_i])
-    edge = toEdge(punto[0],punto[1])
-    puntoMedio = puntoMedio(edge,node)
-    nuevoTriangulo = []
-    for k in 0..triangulo.length-1
-      if(k!=lado)
-        triangulo[k]<<puntoMedio[0]
-        nuevoTriangulo << triangulo[k]
-      end
-    end
-    for j in 0..mesh.length-1
-      if(mesh[j]==listaDeTriangulosArefinar)
-        mesh[j]= nuevoTriangulo[0]
-      end
-    end
-    mesh<< nuevoTriangulo[1]
-
-    igual = iguales(mesh,triangulo,lado)
-
-
-    if igual != []
-      crearTriangulo(mesh,node,igual)
-    end
-    mesh[0][0]= mesh.length-1
-  end
-  if dimension!=2
-    for i in 0..combinacion.length-1
-      triangulo = combinacion[i]
-      lado = buscarNodo(triangulo,node)
-      punto = buscarPunto(node,triangulo[lado.to_i])
-      edge = toEdge(punto[0],punto[1])
-      puntoMedio = puntoMedio(edge,node)
-      nuevoTriangulo = []
-      for k in 0..triangulo.length-1
-        if(k!=lado)
-          triangulo[k]<<puntoMedio[0]
-          nuevoTriangulo << triangulo[k]
-        end
-      end
-      for j in 0..mesh.length-1
-        if(mesh[j]==listaDeTriangulosArefinar[i])
-          mesh[j]= nuevoTriangulo[0]
-        end
-      end
-      mesh<< nuevoTriangulo[1]
-
-      igual = iguales(mesh,triangulo,lado)
-
-
-      if igual != []
-        crearTriangulo(mesh,node,igual)
-      end
-    end
-    mesh[0][0]= mesh.length-1
-  end
-end #complejidad O(2n+n((n+1)+(n^2)+(1)+(n+1)+n+n)) --> O(2n+n(n^2+4n+3))--> O(2n+n^3+4n^2+3n)->O(n^3+4n^2+5)
 
 
 
-uno = toEdge(node[1],node[2])
-dos = toEdge(node[1],node[3])
-tres = toEdge(node[2],node[3])
-t = Triangulos.new(uno.length, dos.length, tres.length, grado.to_i) 
 cantidad = mesh[0][0].to_i/world.size
 resto = mesh[0][0].to_i%world.size
 mesh_nodo = dividirTriangulosPorNodo(cantidad.to_i,mesh[0][0].to_i)
@@ -235,6 +169,7 @@ triangulos_a_ref = triangulosArefinar(candidato)
 generarPart(mesh_nodo)
 generarNode(node)
 generarEle(mesh)
+
 
 def pertenezco_al_nodo(tr_a_refinar,mesh_nodo,rank)
   for i in 0..mesh_nodo.size-1
@@ -255,7 +190,10 @@ def mesh_por_rank(lista,mesh)
   return resultado
 end
 rank = world.rank
+if rank== 0
+  p candidato.reduce(:+)
 
+end
 for i in 0..rank
   if i == rank
     sum = 0
