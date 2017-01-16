@@ -194,26 +194,23 @@ if rank== 0
   p candidato.reduce(:+)
 
 end
-for i in 0..rank
-  if i == rank
-    sum = 0
-    a = NArray.int(cantidad.to_i+resto)
-    k=0
-    for j in 0..mesh_nodo.size-1
-      if mesh_nodo[j][1]==rank
-        a[k]=mesh_nodo[j][0]
-        k+=1
-      end
-    end
-    ref = 0
-    lista = a.to_a
-    mesh_temporal = mesh_por_rank(lista,mesh)
-    lista_candito = candidatos_a_refinar(mesh_temporal,node,grado)
-
-    puts 'rank: '+rank.to_s+' '+(lista_candito.reduce(:+)).to_s
-    world.Send(a, 0, 1)
+sum = 0
+a = NArray.int(cantidad.to_i+resto)
+k=0
+for j in 0..mesh_nodo.size-1
+  if mesh_nodo[j][1]==rank
+    a[k]=mesh_nodo[j][0]
+    k+=1
   end
 end
+ref = 0
+lista = a.to_a
+mesh_temporal = mesh_por_rank(lista,mesh)
+lista_candito = candidatos_a_refinar(mesh_temporal,node,grado)
+
+puts 'rank: '+rank.to_s+' '+(lista_candito.reduce(:+)).to_s
+world.Send(a, 0, 1)
+
 if rank == 0
   (world.size).times do |i|
     a = NArray.int(cantidad.to_i+resto)
