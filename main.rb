@@ -192,34 +192,25 @@ end
 rank = world.rank
 if rank== 0
   p candidato.reduce(:+)
-
 end
-sum = 0
-a = NArray.int(cantidad.to_i+resto)
-k=0
-for j in 0..mesh_nodo.size-1
-  if mesh_nodo[j][1]==rank
-    a[k]=mesh_nodo[j][0]
-    k+=1
+
+if rank 
+  a = NArray.int(cantidad.to_i+resto)
+  for i in 0..a.size-1
+    a[i]=candidato[i]
   end
+  world.Send(a, 0, 1)
+  p rank
 end
-ref = 0
-lista = a.to_a
-mesh_temporal = mesh_por_rank(lista,mesh)
-lista_candito = candidatos_a_refinar(mesh_temporal,node,grado)
-
-puts 'rank: '+rank.to_s+' '+(lista_candito.reduce(:+)).to_s
-world.Send(a, 0, 1)
 
 if rank == 0
   (world.size).times do |i|
     a = NArray.int(cantidad.to_i+resto)
     world.Recv(a, i, 1)
-
+    p a
   end
+
 end
-
-
 
 
 MPI.Finalize
