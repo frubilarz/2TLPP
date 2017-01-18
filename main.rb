@@ -54,7 +54,37 @@ def combinaciones(mesh)
   end
   return combinacion
 end # complejidad O(2n)
-
+def triangulos_por_nodo(np,largo_mesh,triangulos_a_refinar)
+  lista = []
+  mesh_nodo =[]
+  np_aux = 0
+  for i in 1..largo_mesh
+    lista << i
+  end
+  
+  for i in 0..triangulos_a_refinar.length-1
+    lista_ayuda= []
+    lista_ayuda << triangulos_a_refinar[i] << np_aux
+    mesh_nodo << lista_ayuda
+    np_aux+=1
+    if  np_aux >= np
+      np_aux = 0
+    end
+    lista.delete(triangulos_a_refinar[i])
+  end
+  np_aux = 0
+  for i in 0..lista.size-1
+    lista_ayuda=[]
+    lista_ayuda<< lista[i] << np_aux
+    mesh_nodo<< lista_ayuda
+    np_aux+=1
+    if  np_aux >= np
+      np_aux = 0
+    end
+  end
+  
+  return mesh_nodo
+end
 def dividirTriangulosPorNodo(tamano,cantidad)
   ma=[]
   resto = -1*(cantidad%tamano)
@@ -88,9 +118,9 @@ def dividirTriangulosPorNodo(tamano,cantidad)
   return ma
 end
 
-def generarPart(mesh)
+def generarPart(mesh,tamano)
   File.open('archivo.part','w') do |f|
-    f.puts mesh.length.to_s+' '+(mesh[-1][1]+1).to_s
+    f.puts mesh.length.to_s+' '+tamano.to_s
     for i in 0..mesh.length-1
       f.puts mesh[i][0].to_s+' '+(mesh[i][1]+1).to_s
     end
@@ -163,44 +193,37 @@ end #complejidad O(n)
 
 cantidad = mesh[0][0].to_i/world.size
 resto = mesh[0][0].to_i%world.size
-mesh_nodo = dividirTriangulosPorNodo(cantidad.to_i,mesh[0][0].to_i)
 candidato = candidatos_a_refinar(mesh,node,grado)
 triangulos_a_ref = triangulosArefinar(candidato)
-generarPart(mesh_nodo)
+mesh_nodo = triangulos_por_nodo(world.size,mesh[0][0],triangulos_a_ref)
+
+generarPart(mesh_nodo,world.size)
 generarNode(node)
 generarEle(mesh)
 
-
-def pertenezco_al_nodo(tr_a_refinar,mesh_nodo,rank)
+def mesh_del_rank(mesh_nodo, rank)
+  lista = []
   for i in 0..mesh_nodo.size-1
-    if tr_a_refinar == mesh_nodo[i][0]
-      if rank== mesh_nodo[i][1]
-        return 1
-      end
+    if mesh_nodo[i][1]== rank
+      lista << mesh_nodo[i][0]
     end
   end
-  return 0
+  return lista
 end
 
-def mesh_por_rank(lista,mesh)
-  resultado =[]
-  for i in 0..lista.length-1
-    resultado << mesh[lista[i]+1]
-  end
-  return resultado
-end
+
 rank = world.rank
 if rank== 0
-  p candidato.reduce(:+)
+  p 'cantidad de tr a refinar '+candidato.reduce(:+).to_s
 end
 
 if rank 
+  lista = mesh_del_rank(mesh_nodo,rank)
   a = NArray.int(cantidad.to_i+resto)
-  for i in 0..a.size-1
-    a[i]=candidato[i]
+  for i in 0..a.length-1
+    a[i]=lista[i].to_i
   end
   world.Send(a, 0, 1)
-  p rank
 end
 
 if rank == 0
