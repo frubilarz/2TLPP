@@ -452,7 +452,7 @@ if rank == 0
     a = NArray.int(cantidad.to_i+resto)
     world.Recv(a, i, 1)
     p a
-
+    
   end
 
 end
@@ -460,7 +460,6 @@ p mesh.size
 p mesh_nodo.size
   
 
-generarPart(mesh_nodo,world.size)
 generarNode(node)
 generarEle(mesh)
 
