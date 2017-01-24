@@ -3,16 +3,16 @@ require_relative('./node')
 #mesh = ARGV[1] # recive el nombre del fichero .mesh
 node = 'vertices'
 mesh= 'triangulos'
-
+tamano = ARGV[0]
 preproceso = Node.new(node,mesh) # instancia un objeto con los datos node y mesh 
 node = preproceso.node # prepocesamiento node
 mesh = preproceso.mesh # prepoceso mesh
 
 def posicionMasAlaDerecha(node)
-  menor = -9999999999
+  menor = 9999999999
   posicion = 0
   for i in 0..node.size-1
-    if menor < node[i][1]
+    if menor > node[i][1]
       menor = node[i][1]
       posicion = i
     end
@@ -74,13 +74,35 @@ end
 def ordenarMalla(mesh,combinaciones_mesh,vecino,lista)
   for i in 0..combinaciones_mesh.size-1
     temporal = combinaciones_mesh[i]
-    if vecino[0]==temporal[0] || vecino[1] == temporal[1] || vecino[2]== temporal[2] ||
-        vecino[0]==temporal[0].reverse || vecino[1] == temporal[1].reverse || vecino[2]== temporal[2].reverse
+    if vecino[0]==temporal[0] || vecino[0] == temporal[1] || vecino[0]== temporal[2] ||
+        vecino[0]==temporal[0].reverse || vecino[0] == temporal[1].reverse || vecino[0]== temporal[2].reverse ||
+        vecino[1]==temporal[0] || vecino[1] == temporal[1] || vecino[1]== temporal[2] ||
+        vecino[1]==temporal[0].reverse || vecino[1] == temporal[1].reverse || vecino[1]== temporal[2].reverse ||
+        vecino[2]==temporal[0] || vecino[2] == temporal[1] || vecino[2]== temporal[2] ||
+        vecino[2]==temporal[0].reverse || vecino[2] == temporal[1].reverse || vecino[2]== temporal[2].reverse
       if(!estaContenida(i+1,lista))
         lista<<i+1
         combinaciones_primero = combinaciones(mesh[lista[-1]])
         ordenarMalla(mesh,combinaciones_mesh,combinaciones_primero,lista)
       end
+    end
+  end
+end
+
+
+def generarPart(tamano,lista)
+  cantidad = lista.size/tamano
+  rank = 1
+  File.open('prueba.part','w') do |f|
+    f.puts lista.length.to_s+' '+tamano.to_s
+    for i in 0..lista.length-1
+      if i == rank*cantidad
+        rank+=1
+      end
+      if rank > tamano
+        rank = tamano
+      end
+      f.puts lista[i].to_s+ ' '+rank.to_s
     end
   end
 end
@@ -91,9 +113,4 @@ lista <<  primero
 combinaciones_mesh = combinaciones(mesh)
 combinaciones_primero = combinaciones(mesh[primero])
 ordenarMalla(mesh,combinaciones_mesh,combinaciones_primero,lista)
-for i in 0..lista.size-1
-  combinaciones_primero = combinaciones(mesh[lista[-1]])
-  ordenarMalla(mesh,combinaciones_mesh,combinaciones_primero,lista) 
-end
-
- 
+generarPart(tamano,lista)
