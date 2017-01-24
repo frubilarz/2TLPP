@@ -99,8 +99,8 @@ def generarPart(tamano,lista)
       if i == rank*cantidad
         rank+=1
       end
-      if rank > tamano
-        rank = tamano
+      if rank > tamano.to_i
+        rank = tamano.to_i
       end
       f.puts lista[i].to_s+ ' '+rank.to_s
     end
@@ -116,14 +116,3 @@ ordenarMalla(mesh,combinaciones_mesh,combinaciones_primero,lista)
 generarPart(tamano,lista)
 
 
-
-
-
-def multiplicar(vector,valor,largo)
-  if vector[largo-1]== 0 || valor ==0 || largo == 0
-    return 0
-  else
-    vector[largo-1]=vector[largo-1]*valor
-    multiplicar(vector,valor,largo-1)
-  end
-end
