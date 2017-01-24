@@ -72,23 +72,27 @@ def estaContenida(triangulo,lista)
 end
 
 def ordenarMalla(mesh,combinaciones_mesh,vecino,lista)
+  aux = []
   for i in 0..combinaciones_mesh.size-1
     temporal = combinaciones_mesh[i]
     if vecino[0]==temporal[0] || vecino[0] == temporal[1] || vecino[0]== temporal[2] ||
         vecino[0]==temporal[0].reverse || vecino[0] == temporal[1].reverse || vecino[0]== temporal[2].reverse ||
+        
         vecino[1]==temporal[0] || vecino[1] == temporal[1] || vecino[1]== temporal[2] ||
         vecino[1]==temporal[0].reverse || vecino[1] == temporal[1].reverse || vecino[1]== temporal[2].reverse ||
+        
         vecino[2]==temporal[0] || vecino[2] == temporal[1] || vecino[2]== temporal[2] ||
         vecino[2]==temporal[0].reverse || vecino[2] == temporal[1].reverse || vecino[2]== temporal[2].reverse
-      if(!estaContenida(i+1,lista))
-        lista<<i+1
-        combinaciones_primero = combinaciones(mesh[lista[-1]])
-        ordenarMalla(mesh,combinaciones_mesh,combinaciones_primero,lista)
-      end
+      aux << i+1
     end
   end
+  for i in 0..aux.size-1
+    if (!estaContenida(aux[i],lista))
+      lista<< aux[i]
+    end
+  end
+  return aux
 end
-
 
 def generarPart(tamano,lista)
   cantidad = lista.size.to_i/tamano.to_i
@@ -111,8 +115,14 @@ lista =[]
 primero = primerTriangulo(mesh,node)
 lista <<  primero
 combinaciones_mesh = combinaciones(mesh)
-combinaciones_primero = combinaciones(mesh[primero])
-ordenarMalla(mesh,combinaciones_mesh,combinaciones_primero,lista)
+
+i=0
+loop do
+
+  combinaciones_primero = combinaciones(mesh[lista[i]])
+  ordenarMalla(mesh,combinaciones_mesh,combinaciones_primero,lista)
+  i+=1
+  break if lista.size == mesh.size-1
+end
+
 generarPart(tamano,lista)
-
-

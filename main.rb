@@ -230,7 +230,7 @@ end #complejidad O(2n+n((n+1)+(n^2)+(1)+(n+1)+n+n)) --> O(2n+n(n^2+4n+3))--> O(2
 
 def mesh_del_rank(mesh_nodo, rank)
   lista = []
-  for i in 0..mesh_nodo.size-1
+  for i in 1..mesh_nodo.size-1
     if mesh_nodo[i][1]== rank+1
       lista << mesh_nodo[i][0]
     end
@@ -412,25 +412,16 @@ if rank
     a[i]=lista[i].to_i
   end
   
-  triangulos_total_del_nodo = calculateTriangle(mesh,lista)
+  triangulos_total_del_nodo = calculateTriangle(mesh,lista)  
+  triangulos = triangulosArefinar(candidato) # O(n+1)
+  vertices = calculateTriangle(mesh,triangulos) #O(n+1)
+ 
+  crearTriangulo(triangulos_total_del_nodo,node,vertices,mesh_nodo,rank)
   
-  nova =[]
-  for i in 0..mesh_nodo.size-1
-    for j in 0..triangulos_a_ref.size-1
-      if mesh_nodo[i][1] == rank
-        if mesh_nodo[i][0] == triangulos_a_ref[j]
-          nova << triangulos_a_ref[j]
-        end
-      end
-    end
-  end
-  
-  triangulos_por_lado = calculateTriangle(mesh,nova)
-  crearTriangulo(triangulos_total_del_nodo,node,triangulos_por_lado,mesh_nodo,rank)
-  
+  p "ranks   "+rank.to_s+' largo'+mesh_nodo.size.to_s
+  p "mesh primero"+mesh_nodo[0].to_s
   world.Send(a, 0, 1)
 end
-
 
 if rank == 0
   (world.size).times do |i|
@@ -441,8 +432,9 @@ if rank == 0
   end
 
 end
-  
 
+
+p "mesh"+mesh.size.to_s
 MPI.Finalize
 
 
