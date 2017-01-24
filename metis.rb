@@ -91,7 +91,7 @@ end
 
 
 def generarPart(tamano,lista)
-  cantidad = lista.size/tamano
+  cantidad = lista.size.to_i/tamano
   rank = 1
   File.open('prueba.part','w') do |f|
     f.puts lista.length.to_s+' '+tamano.to_s
@@ -114,3 +114,16 @@ combinaciones_mesh = combinaciones(mesh)
 combinaciones_primero = combinaciones(mesh[primero])
 ordenarMalla(mesh,combinaciones_mesh,combinaciones_primero,lista)
 generarPart(tamano,lista)
+
+
+
+
+
+def multiplicar(vector,valor,largo)
+  if vector[largo-1]== 0 || valor ==0 || largo == 0
+    return 0
+  else
+    vector[largo-1]=vector[largo-1]*valor
+    return multiplicar(vector,valor,largo-1)
+  end
+end
