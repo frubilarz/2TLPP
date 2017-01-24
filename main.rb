@@ -9,7 +9,6 @@ end
 #mesh = ARGV[1] # recive el nombre del fichero .mesh
 grado = ARGV[0]
 MPI.Init
-world = MPI::Comm::WORLD
 node = 'vertices'
 mesh= 'triangulos'
 #grado = 12
@@ -388,11 +387,7 @@ def leerTriangulos()
   end
   return triangulos
 end
-cantidad = mesh[0][0].to_i/world.size
-resto = mesh[0][0].to_i%world.size
-candidato = candidatos_a_refinar(mesh,node,grado)
-triangulos_a_ref = triangulosArefinar(candidato)
-mesh_nodo = leerTriangulos()
+
 
 
 generarNode(node)
@@ -400,8 +395,16 @@ generarEle(mesh)
 
 
 
+inicio = Time.now
+world = MPI::Comm::WORLD
+cantidad = mesh[0][0].to_i/world.size
+resto = mesh[0][0].to_i%world.size
+candidato = candidatos_a_refinar(mesh,node,grado)
+
+mesh_nodo = leerTriangulos()
 rank = world.rank
 if rank== 0
+  
   p 'cantidad de tr a refinar '+candidato.reduce(:+).to_s
 end
 
@@ -418,8 +421,8 @@ if rank
  
   crearTriangulo(triangulos_total_del_nodo,node,vertices,mesh_nodo,rank)
   
-  p "ranks   "+rank.to_s+' largo'+mesh_nodo.size.to_s
-  p "mesh primero"+mesh_nodo[0].to_s
+  #p "ranks   "+rank.to_s+' largo'+mesh_nodo.size.to_s
+  #p "mesh primero"+mesh_nodo[0].to_s
   world.Send(a, 0, 1)
 end
 
@@ -427,15 +430,18 @@ if rank == 0
   (world.size).times do |i|
     a = NArray.int(cantidad.to_i+resto)
     world.Recv(a, i, 1)
-    p a
     
   end
 
 end
 
 
-p "mesh"+mesh.size.to_s
+
 MPI.Finalize
 
 
+final = Time.now
+tiempo_paralelo= final-inicio
+
+puts "tiempo en parelo:   " + tiempo_paralelo.to_s
 
