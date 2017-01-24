@@ -91,7 +91,7 @@ end
 
 
 def generarPart(tamano,lista)
-  cantidad = lista.size.to_i/tamano
+  cantidad = lista.size.to_i/tamano.to_i
   rank = 1
   File.open('prueba.part','w') do |f|
     f.puts lista.length.to_s+' '+tamano.to_s
@@ -124,6 +124,6 @@ def multiplicar(vector,valor,largo)
     return 0
   else
     vector[largo-1]=vector[largo-1]*valor
-    return multiplicar(vector,valor,largo-1)
+    multiplicar(vector,valor,largo-1)
   end
 end
