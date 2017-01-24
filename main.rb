@@ -56,37 +56,7 @@ def combinaciones(mesh)
   end
   return combinacion
 end # complejidad O(2n)
-def triangulos_por_nodo(np,largo_mesh,triangulos_a_refinar)
-  lista = []
-  mesh_nodo =[]
-  np_aux = 0
-  for i in 1..largo_mesh
-    lista << i
-  end
-  
-  for i in 0..triangulos_a_refinar.length-1
-    lista_ayuda= []
-    lista_ayuda << triangulos_a_refinar[i] << np_aux
-    mesh_nodo << lista_ayuda
-    np_aux+=1
-    if  np_aux >= np
-      np_aux = 0
-    end
-    lista.delete(triangulos_a_refinar[i])
-  end
-  np_aux = 1
-  for i in 0..lista.size-1
-    lista_ayuda=[]
-    lista_ayuda<< lista[i] << np_aux
-    mesh_nodo<< lista_ayuda
-    np_aux+=1
-    if  np_aux >= np
-      np_aux = 0
-    end
-  end
-  
-  return mesh_nodo
-end
+
 def dividirTriangulosPorNodo(tamano,cantidad)
   ma=[]
   resto = -1*(cantidad%tamano)
@@ -261,7 +231,7 @@ end #complejidad O(2n+n((n+1)+(n^2)+(1)+(n+1)+n+n)) --> O(2n+n(n^2+4n+3))--> O(2
 def mesh_del_rank(mesh_nodo, rank)
   lista = []
   for i in 0..mesh_nodo.size-1
-    if mesh_nodo[i][1]== rank
+    if mesh_nodo[i][1]== rank+1
       lista << mesh_nodo[i][0]
     end
   end
@@ -404,15 +374,30 @@ def revisar(mesh,node,mesh_nodo,rank)
   return lista
 end
 
+def leerTriangulos()
+  triangulos = []
+  File.open('prueba.part','r') do |f| # en espiral.lista estan definidos los triangulos con sus puntos
+    while linea = f.gets
+      triangulos << linea.delete("\n")
+    end
+  end
+  for i in 0..triangulos.length-1
+    triangulos[i]= triangulos[i].split(" ")
+    triangulos[i][0]=triangulos[i][0].to_i
+    triangulos[i][1]=triangulos[i][1].to_i
+  end
+  return triangulos
+end
 cantidad = mesh[0][0].to_i/world.size
 resto = mesh[0][0].to_i%world.size
 candidato = candidatos_a_refinar(mesh,node,grado)
 triangulos_a_ref = triangulosArefinar(candidato)
-mesh_nodo = triangulos_por_nodo(world.size,mesh[0][0],triangulos_a_ref)
+mesh_nodo = leerTriangulos()
 
-generarPart(mesh_nodo,world.size)
+
 generarNode(node)
 generarEle(mesh)
+
 
 
 rank = world.rank
@@ -456,13 +441,7 @@ if rank == 0
   end
 
 end
-p mesh.size
-p mesh_nodo.size
   
-
-generarNode(node)
-generarEle(mesh)
-
 
 MPI.Finalize
 
